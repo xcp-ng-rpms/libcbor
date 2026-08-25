@@ -1,6 +1,6 @@
 Name:		libcbor
 Version:	0.11.0
-Release:	3.1%{?dist}
+Release:	3.1~xcpng3701.2%{?dist}
 Summary:	A CBOR parsing library
 %bcond_without xcpng
 
