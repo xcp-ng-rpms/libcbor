@@ -1,6 +1,6 @@
 Name:		libcbor
 Version:	0.11.0
-Release:	3%{?dist}
+Release:	3.1%{?dist}
 Summary:	A CBOR parsing library
 
 License:	MIT
@@ -8,12 +8,17 @@ URL:		http://libcbor.org
 Source0:	https://github.com/PJK/%{name}/archive/v%{version}.tar.gz
 
 BuildRequires:	cmake
-BuildRequires:	doxygen
+# XCP-ng BEGIN documentation not built: python3-breathe, python3-sphinx
+# and python3-sphinx_rtd_theme are not available, so doxygen is not needed either
+#BuildRequires:	doxygen
+# XCP-ng END
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
-BuildRequires:	python3-breathe
-BuildRequires:	python3-sphinx
-BuildRequires:	python3-sphinx_rtd_theme
+# XCP-ng BEGIN documentation not built
+#BuildRequires:	python3-breathe
+#BuildRequires:	python3-sphinx
+#BuildRequires:	python3-sphinx_rtd_theme
+# XCP-ng END
 BuildRequires:	make
 BuildRequires:	pkgconfig(cmocka)
 
@@ -34,14 +39,18 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=ON
 %cmake_build
-cd doc
-make man
+# XCP-ng BEGIN documentation not built
+#cd doc
+#make man
+# XCP-ng END
 
 
 %install
 %cmake_install
-mkdir -p %{buildroot}%{_mandir}/man3
-cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
+# XCP-ng BEGIN documentation not built
+#mkdir -p %%{buildroot}%%{_mandir}/man3
+#cp doc/build/man/libcbor.3 %%{buildroot}%%{_mandir}/man3/
+# XCP-ng END
 
 
 %check
@@ -51,7 +60,11 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %files
 %license LICENSE.md
 %doc README.md
-%{_libdir}/libcbor.so.0.11{,.*}
+# XCP-ng BEGIN brace glob not supported by our rpm
+#%%{_libdir}/libcbor.so.0.11{,.*}
+%{_libdir}/libcbor.so.0.11
+%{_libdir}/libcbor.so.0.11.*
+# XCP-ng END
 
 %files devel
 %{_includedir}/cbor.h
@@ -59,9 +72,15 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %{_libdir}/libcbor.so
 %{_libdir}/pkgconfig/libcbor.pc
 %{_libdir}/cmake/libcbor
-%{_mandir}/man3/libcbor.3{,.*}
+# XCP-ng BEGIN documentation not built
+#%%{_mandir}/man3/libcbor.3{,.*}
+# XCP-ng END
 
 %changelog
+* Fri Sep 25 2026 Lucas Ravagnier <lucas.ravagnier@vates.tech> - 0.11.0-3.1
+- First import of libcbor 0.11.0-3
+- Remove the documentation, as XCP-ng lacks the necessary dependencies to build it.
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 0.11.0-3
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
