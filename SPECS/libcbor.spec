@@ -1,19 +1,27 @@
 Name:		libcbor
 Version:	0.11.0
-Release:	3%{?dist}
+Release:	3.1%{?dist}
 Summary:	A CBOR parsing library
+%bcond_without xcpng
 
 License:	MIT
 URL:		http://libcbor.org
 Source0:	https://github.com/PJK/%{name}/archive/v%{version}.tar.gz
 
 BuildRequires:	cmake
+# XCP-ng have doxygen, but because we don't have python3-breathe, python3-sphinx,
+# python3-sphinx_rtd_theme this package is not needed anymore.
+%if %{without xcpng}
 BuildRequires:	doxygen
+%endif
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
+# XCP-ng does not have python3-breathe, python3-sphinx, python3-sphinx_rtd_theme
+%if %{without xcpng}
 BuildRequires:	python3-breathe
 BuildRequires:	python3-sphinx
 BuildRequires:	python3-sphinx_rtd_theme
+%endif
 BuildRequires:	make
 BuildRequires:	pkgconfig(cmocka)
 
@@ -34,14 +42,20 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=ON
 %cmake_build
+# XCP-ng don't have the previous BuildRequires, we can't build the documentation.
+%if %{without xcpng}
 cd doc
 make man
+%endif
 
 
 %install
 %cmake_install
+# XCP-ng can't build the documentation, we will not package it.
+%if %{without xcpng}
 mkdir -p %{buildroot}%{_mandir}/man3
 cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
+%endif
 
 
 %check
@@ -51,7 +65,13 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %files
 %license LICENSE.md
 %doc README.md
+# XCP-ng do not support this glob
+%if %{without xcpng}
 %{_libdir}/libcbor.so.0.11{,.*}
+%else
+%{_libdir}/libcbor.so.0.11
+%{_libdir}/libcbor.so.0.11.*
+%endif
 
 %files devel
 %{_includedir}/cbor.h
@@ -59,9 +79,17 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %{_libdir}/libcbor.so
 %{_libdir}/pkgconfig/libcbor.pc
 %{_libdir}/cmake/libcbor
+# XCP-ng does not support this glob & We don't build the documentation
+%if %{without xcpng}
 %{_mandir}/man3/libcbor.3{,.*}
+%endif
 
 %changelog
+* Tue Aug 25 2026 Lucas Ravagnier <lucas.ravagnier@vates.tech> - 0.11.0-3.1
+- First import of libcbor 0.11.0.3
+- Even though we have Doxygen, it isn't enough to build the documentation.
+- I removed it because the dependency would be useless.
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 0.11.0-3
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
